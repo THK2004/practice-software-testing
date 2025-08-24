@@ -1,0 +1,11 @@
+TestCaseID,TestDescription,invoiceId,status,status_message,ExpectedResult
+EI21,Update status with AWAITING_FULFILLMENT,1,"AWAITING_FULFILLMENT","Awaiting fulfillment","200 OK {success:true}"
+EI22,Update status with COMPLETED,1,"COMPLETED","Completed","200 OK {success:true}"
+EI23,Update status with ON_HOLD,1,"ON_HOLD","On hold","200 OK {success:true}"
+EI24,Update status with AWAITTING_SHIPMENT,1,"AWAITTING_SHIPMENT","Awaiting shipment","200 OK {success:true}"
+EI25,Update status with SHIPPED,1,"SHIPPED","Shipped","200 OK {success:true}"
+EI26,Update status with invalid value,1,"INVALID_STATUS","Invalid status","200 OK {success:true}"
+EI27,Update status with empty value,1,,"","422 Unprocessable"
+EI28,Update status with missing field,1,,"","422 Unprocessable"
+EI29,Update status of non-existing invoiceId,999,"AWAITING_FULFILLMENT","Awaiting fulfillment","404 Not Found"
+EI30,Update status without token,1,"AWAITING_FULFILLMENT","Awaiting fulfillment","401 Unauthorized"

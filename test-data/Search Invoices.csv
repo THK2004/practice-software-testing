@@ -1,0 +1,12 @@
+TestCaseID,TestDescription,Query,ExpectedResult
+GI19,Search invoice by valid number,INV-2022000002,200 OK, returns matching invoice
+GI20,Search invoice by partial number,INV-2022,200 OK, returns invoices whose numbers contain “INV-2022”
+GI21,Search invoice by billing address,Test street 123,200 OK, returns matching invoice
+GI22,Search invoice by partial billing address,street 123,200 OK, returns invoices whose numbers contain “street 123”
+GI23,Search invoice by status,COMPLETED,200 OK, returns Completed invoices
+GI24,Search with whitespace, INV-2022000002 ,200 OK, returns matching invoice if any
+GI25,Search with empty string,,200 OK, Returns all invoices
+GI26,Search with special chars,@#$%,Response 200 with empty data[]
+GI27,Search with non-existing term,NOTFOUND,Response 200 with empty data[]
+GI28,Search too long query,aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,API handles gracefully (200 with empty results or 404)
+GI29,Search too short query,a,200 OK, Returns all invoices with match

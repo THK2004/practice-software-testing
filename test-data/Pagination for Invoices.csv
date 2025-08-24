@@ -1,0 +1,4 @@
+TestCaseID,TestDescription,Page,ExpectedResult
+GI16,Pagination works (page=1),1,Response 200, contains current_page=1
+GI17,Pagination works (page=2),2,Response 200, current_page=2 or empty data
+GI18,Invalid pagination (page=-1),-1,Response 404 or empty data

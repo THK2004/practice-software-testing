@@ -1,0 +1,9 @@
+TestCaseID,TestDescription,InvoiceID,ExpectedResult
+GI04,Get invoice by valid ID,1,200 OK with invoice details
+GI05,Get invoice by non-existent ID,999,404 Not Found
+GI06,Get invoice with invalid ID format,abc,404 Not Found
+GI07,Get invoice with ID=0,0,404 Not Found
+GI08,Get invoice with max integer ID,2147483647,404 Not Found or 200 if exists
+GI09,Get invoice with negative ID,-1,404 Not Found
+GI10,Get invoice with decimal ID,1.5,404 Not Found
+GI11,Get invoice with special chars in ID,@#$%,404 Not Found

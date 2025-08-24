@@ -1,0 +1,7 @@
+TestCaseID,TestDescription,Year,ExpectedResult
+GR11,Get yearly sales report without number of year,,200 OK
+GR12,Get yearly sales report with invalid number of year,abcd,404 Not Found
+GR13,Get yearly sales report with a valid number of year,5,200 OK
+GR14,Get yearly sales report with a negative number of year,-2,404 Not Found
+GR15,Get yearly sales report with a decimal number of year,1.5,404 Not Found
+GR11,Get yearly sales report with no token,,401 Unauthorized
