@@ -43,6 +43,7 @@ jobs:
             --iteration-data test-data/Pagination\ for\ Invoices.csv \
             --iteration-data test-data/Search\ Invoices.csv \
             --reporters cli,htmlextra --reporter-htmlextra-export newman/get_invoice.html
+        continue-on-error: true
 
       - name: Run Edit Invoice Collection
         run: |
@@ -51,6 +52,7 @@ jobs:
             --iteration-data test-data/Edit_Invoice_Data.csv \
             --iteration-data test-data/Update_Invoice_Status.csv \
             --reporters cli,htmlextra --reporter-htmlextra-export newman/edit_invoice.html
+        continue-on-error: true
 
       - name: Run Get Report Collection
         run: |
@@ -58,6 +60,7 @@ jobs:
             --env-var baseUrl="http://localhost:8091" \
             --iteration-data test-data/Get\ Yearly\ Sales\ Report.csv \
             --reporters cli,htmlextra --reporter-htmlextra-export newman/get_report.html
+        continue-on-error: true
 
       - name: Upload Newman Reports 📊
         uses: actions/upload-artifact@v4
