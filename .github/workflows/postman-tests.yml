@@ -27,11 +27,12 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Build and Run App
-        working-directory: practice-software-testing/sprint5-with-bugs
+      - name: Configure Sprint and Run App
+        working-directory: practice-software-testing
         run: |
+          echo "SPRINT=sprint5-with-bugs" > .env
           mvn clean package -DskipTests
-          nohup java -jar target/*.jar > app.log 2>&1 &
+          nohup mvn spring-boot:run > app.log 2>&1 &
 
       - name: Wait for App to be ready
         run: |
