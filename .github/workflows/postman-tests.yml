@@ -9,42 +9,23 @@ on:
 
 jobs:
   postman-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repo ⚙️
         uses: actions/checkout@v4
 
-      - name: Checkout practice-software-testing app
-        uses: actions/checkout@v4
-        with:
-          repository: testsmith-io/practice-software-testing
-          path: practice-software-testing
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Configure Sprint and Run App
-        working-directory: practice-software-testing
+      - name: Start containers 🐳
         run: |
-          echo "SPRINT=sprint5-with-bugs" > .env
-          mvn clean package -DskipTests
-          nohup mvn spring-boot:run > app.log 2>&1 &
+          export DISABLE_LOGGING=true
+          docker compose -f docker-compose.yml up -d --force-recreate
 
-      - name: Wait for App to be ready
-        run: |
-          for i in {1..30}; do
-            if curl -s http://localhost:8091/actuator/health | grep '"status":"UP"' ; then
-              echo "App is up!"
-              exit 0
-            fi
-            echo "Waiting for app..."
-            sleep 5
-          done
-          echo "App did not start in time" && exit 1
+      - name: Sleep for 60 seconds ⏱
+        run: sleep 60s
+        shell: bash
+
+      - name: Verify app health
+        run: curl -v http://localhost:8091/status
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -78,8 +59,9 @@ jobs:
             --iteration-data test-data/Get\ Yearly\ Sales\ Report.csv \
             --reporters cli,htmlextra --reporter-htmlextra-export newman/get_report.html
 
-      - name: Upload Newman Reports
+      - name: Upload Newman Reports 📊
         uses: actions/upload-artifact@v4
         with:
           name: newman-reports
           path: newman/
+          retention-days: 10
