@@ -1,4 +1,4 @@
-name: Run Postman Collection with CSV Data
+name: Postman API Tests
 
 on:
   push:
@@ -8,67 +8,57 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-postman:
+  postman-tests:
     runs-on: ubuntu-latest
-    
+    services:
+      app:
+        image: ghcr.io/testsmith-io/practice-software-testing/sprint5-with-bugs:latest
+        ports:
+          - 8091:8091
+        options: >-
+          --health-cmd="curl --fail http://localhost:8091/actuator/health || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
       - name: Install Newman
-        run: npm install -g newman
-      
-      - name: Start Application
+        run: npm install -g newman newman-reporter-htmlextra
+
+      - name: Run Get Invoice Collection
         run: |
-          git clone https://github.com/testsmith-io/practice-software-testing.git
-          cd practice-software-testing/sprint5-with-bugs
-          npm install
-          npm start &
-          sleep 15
-      
-      - name: Download Postman Collection
+          newman run https://api.getpostman.com/collections/${{ secrets.POSTMAN_GET_INVOICE_COLLECTION_KEY }}?apikey=${{ secrets.POSTMAN_API_KEY }} \
+            --env-var baseUrl="http://localhost:8091" \
+            --iteration-data test-data/Get_Invoice_by_id.csv \
+            --iteration-data test-data/Pagination\ for\ Invoices.csv \
+            --iteration-data test-data/Search\ Invoices.csv \
+            --reporters cli,htmlextra --reporter-htmlextra-export newman/get_invoice.html
+
+      - name: Run Edit Invoice Collection
         run: |
-          curl --location \
-            --request GET "https://api.getpostman.com/collections/${{ secrets.POSTMAN_COLLECTION_ID }}" \
-            --header "X-Api-Key: ${{ secrets.POSTMAN_API_KEY }}" \
-            --output collection.json
-      
-      # Option 1: Nếu bạn có CSV trong repo
-      - name: Run Tests with CSV from repo
-        if: hashFiles('test-data/*.csv') != ''
+          newman run https://api.getpostman.com/collections/${{ secrets.POSTMAN_EDIT_INVOICE_COLLECTION_KEY }}?apikey=${{ secrets.POSTMAN_API_KEY }} \
+            --env-var baseUrl="http://localhost:8091" \
+            --iteration-data test-data/Edit_Invoice_Data.csv \
+            --iteration-data test-data/Update_Invoice_Status \
+            --reporters cli,htmlextra --reporter-htmlextra-export newman/edit_invoice.html
+
+      - name: Run Get Report Collection
         run: |
-          # Run với mỗi file CSV
-          for csv_file in test-data/*.csv; do
-            echo "Running tests with $csv_file"
-            newman run collection.json \
-              -d "$csv_file" \
-              --env-var "baseUrl=http://localhost:4200/api" \
-              --iteration-count 30 \
-              --reporters cli
-          done
-      
-      # Option 2: Nếu không có CSV, run collection bình thường
-      - name: Run Tests without CSV
-        if: hashFiles('test-data/*.csv') == ''
-        run: |
-          newman run collection.json \
-            --env-var "baseUrl=http://localhost:4200/api" \
-            --reporters cli,json \
-            --reporter-json-export result.json
-      
-      - name: Display Results
-        if: always()
-        run: |
-          if [ -f result.json ]; then
-            echo "========================"
-            echo "    TEST RESULTS        "
-            echo "========================"
-            assertions=$(jq '.run.stats.assertions.total' result.json)
-            passed=$(jq '.run.stats.assertions.passed' result.json)
-            failed=$(jq '.run.stats.assertions.failed' result.json)
-            
-            echo "Total: $assertions"
-            echo "✅ Passed: $passed"
-            echo "❌ Failed: $failed"
-            echo "========================"
-          fi
+          newman run https://api.getpostman.com/collections/${{ secrets.POSTMAN_GET_REPORT_COLLECTION_KEY }}?apikey=${{ secrets.POSTMAN_API_KEY }} \
+            --env-var baseUrl="http://localhost:8091" \
+            --iteration-data test-data/Get\ Yearly\ Sales\ Report.csv \
+            --reporters cli,htmlextra --reporter-htmlextra-export newman/get_report.html
+
+      - name: Upload Newman Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-reports
+          path: newman/
